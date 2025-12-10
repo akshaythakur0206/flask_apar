@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title if title else "Flask App" }}</title>
+    <style>
+        /* Navbar Styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #2c3e50;
+            overflow: hidden;
+            padding: 10px 20px;
+        }
+        .navbar a {
+            float: left;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .navbar a:hover {
+            background-color: #1abc9c;
+            color: white;
+            border-radius: 6px;
+        }
+        .navbar-right {
+            float: right;
+        }
+        .container {
+            padding: 10px;
+        }
+        .flash {
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .flash.success {
+            background-color: #d4edda;
+            color: #1b3020;
+            border: 1px solid #c3e6cb;
+        }
+
+        .flash.danger {
+            background-color: #f8d7da;
+            color: #cc4351;
+            border: 1px solid #f5c6cb;
+        }
+        .emp_table {
+            border-collapse: collapse;
+            margin: 2rem auto;
+            width: 90%;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .emp_head {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        table.emp_table th, td {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #dddddd;
+        }
+        div.pagination {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        div.pagination a {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            margin: 0 0.25rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        div.pagination a:hover {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        div.pagination span {
+            margin: 0 0.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="{{ url_for('dashboard') }}">Home</a>
+        <a href="{{ url_for('employee') }}">Add Employee</a>
+        <a href="{{ url_for('index') }}">PDF Viewer</a>
+        <div class="navbar-right">
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

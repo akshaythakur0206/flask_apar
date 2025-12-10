@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{emp.name or "apar record"}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_emp.css') }}">
+</head>
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ emp.name }}</h1>
+    <p><strong>Employee ID:</strong> {{ emp.cdac_emp_id }}</p>
+    <p><strong>Department:</strong> {{ emp.dept }}</p>
+    <p><strong>Designation:</strong> {{ emp.designation }}</p>
+    <p><strong>Date of Birth:</strong> {{ emp.dob }}</p>
+    <p><strong>Date of Joining:</strong> {{ emp.doj }}</p>
+    <p><strong>Mobile:</strong> {{ emp.mobile_no }}</p>
+    {% if emp.father_name %}
+    <p><strong>Father's Name:</strong> {{ emp.father_name }}</p>
+    {% endif %}
+    <p><strong>Dossier:</strong> {{ emp.dossier_no }}</p>
+    <hr>
+    <h2>APAR Records</h2>
+    {% if apars %}
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Date From</th>
+                    <th>Date To</th>
+                    <th>Reporting Officer</th>
+                    <th>Reviewing Officer</th>
+                    <th>Status</th>
+                    <th>Grade</th>
+                    <th>Grade Label</th>
+                    <th>Download/view</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in apars %}
+                <tr>
+                    <td>{{ a.date_from }}</td>
+                    <td>{{ a.date_to }}</td>
+                    <td>{{ a.reporting_officer }}</td>
+                    <td>{{ a.reviewing_officer }}</td>
+                    <td>{{ a.apar_status }}</td>
+                    <td>{{ a.grade }}</td>
+                    <td>{{ a.grade_label }}</td> 
+                    <td>Download/View</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No APAR records found.</p>
+    {% endif %}
+    <h2>PDF Files (Dossier: {{ emp.dossier_no }})</h2>
+    {% if pdfs %}
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Employee Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pdfs %}
+                    <tr>
+                        <td>{{p.filename}}</td>
+                        <td>{{p.apar_employee_name}}</td>
+                        <td>
+                            <a href="{{ url_for('view_pdf', filename=p.filename)}}">View</a> / 
+                            <a href="{{ url_for('download_pdf', filename=p.filename)}}">Download</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No PDF files found for this dossier.</p>
+    {% endif %}
+{% endblock %}
+</html>

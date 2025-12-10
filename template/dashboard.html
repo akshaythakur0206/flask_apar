@@ -1,0 +1,113 @@
+<style>
+    div form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    margin: 30px auto;
+    max-width: 400px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+    div form input[type="text"] {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+div form input[type="text"]:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 4px rgba(74,144,226,0.3);
+}
+div form button {
+    padding: 10px 18px;
+    background-color: #3689e9;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+div form button:hover {
+    background-color: #357ABD;
+}
+</style>
+
+{% extends "base.html" %}
+{% block content %}
+    <h1>Welcome</h1>
+    <p>Use the navbar to navigate.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <p class="flash {{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div>
+        <form method="get" action="{{ url_for('dashboard') }}">
+            <input type="text" name="search" placeholder="Search..." value="{{ search }}">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <div>
+        <table class="emp_table" border="1" cellpadding="5" cellspacing="0">
+            <thead class="emp_head">
+                <tr>
+                    {% for col in ['cdac_emp_id', 'name'] %}
+                        <th>
+                            <a href="{{ url_for('dashboard', search=search, sort_by=col, order='asc' if order=='desc' or sort_by!=col else 'desc') }}">
+                                {{ col|capitalize }}
+                                {% if sort_by == col %}
+                                    {{ '↑' if order == 'asc' else '↓' }}
+                                {% endif %}
+                            </a>
+                        </th>
+                    {% endfor %}
+                    <th>Dossier</th>
+                   <th>Department</th>
+                   <th>designation</th>
+                   <th>View Apar</th>
+                </tr>
+            </thead>
+            <tbody class="emp_body">
+                {% for emp in employees %}
+                    <tr>
+                        <td>{{ emp.cdac_emp_id }}</td>
+                        <td>{{ emp.name }}</td>
+                        <td>{{ emp.dossier_no }}</td>
+                        <td>{{ emp.dept }}</td>
+                        <td>{{ emp.designation }}</td>
+                        <td>
+                        <!-- <a href="{{ url_for('employee', cdac_emp_id=emp.cdac_emp_id, action='sahas') }}" class="btn btn-sm btn-primary">View Details</a> -->
+                        <a href="{{ url_for('detail', cdac_emp_id=emp.cdac_emp_id) }}" class="btn btn-sm btn-info">View</a>
+                        <!-- <a href="{{ url_for('detail') }}" class="btn btn-sm btn-info">View</a> -->
+                    </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        {% if pagination.has_prev %}
+            <a href="{{ url_for('dashboard', page=pagination.prev_num)}}">&lt;</a>
+        {% endif %}
+
+        Page {{ pagination.page }} of {{ pagination.pages }}
+
+        {% if pagination.has_next %}
+            <a href="{{ url_for('dashboard', page=pagination.next_num) }}">></a>
+        {% endif %}
+    </div>
+{% endblock %}

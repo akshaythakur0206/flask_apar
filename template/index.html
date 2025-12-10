@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; cursor: pointer; }
+        th:hover { background-color: #ddd; }
+        .search-bar { margin-bottom: 10px; }
+        .search-bar input { margin-right: 10px; padding: 5px; }
+    </style>
+</head>
+{% extends "base.html" %}
+{% block content %}
+    <h1>PDF Viewer</h1>
+    <div class="search-bar">
+        <input type="text" id="dossierSearch" placeholder="Dossier" oninput="filterTable()" value="{{ request.args.get('dossier', '') }}">
+        <input type="text" id="aparSearch" placeholder="APAR Name" oninput="filterTable()" value="{{ request.args.get('apar', '') }}">
+        <input type="text" id="filenameSearch" placeholder="Filename" oninput="filterTable()" value="{{ request.args.get('filename', '') }}">
+    </div>
+    <table id="pdfTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable('dossier_number')">Dossier Number<input type="hidden" id="dossierSort" value="{{ sort_by == 'dossier_number' and sort_order or '' }}"></th>
+                <th onclick="sortTable('apar_employee_name')">APAR Employee Name<input type="hidden" id="aparSort" value="{{ sort_by == 'apar_employee_name' and sort_order or '' }}"></th>
+                <th onclick="sortTable('filename')">Filename<input type="hidden" id="filenameSort" value="{{ sort_by == 'filename' and sort_order or '' }}"></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in pdf_records %}
+            <tr>
+                <td>{{ record.dossier_number or '' }}</td>
+                <td>{{ record.apar_employee_name or '' }}</td>
+                <td>{{ record.filename }}</td>
+                <td>
+                    <a href="{{ url_for('view_pdf', filename=record.filename) }}" target="_blank">View</a>
+                    <a href="{{ url_for('download_pdf', filename=record.filename) }}">Download</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">No records found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if pagination.has_prev %}
+            <a href="{{ url_for('index', page=pagination.prev_num)}}">&lt;</a>
+        {% endif %}
+
+        Page {{ pagination.page }} of {{ pagination.pages }}
+
+        {% if pagination.has_next %}
+            <a href="{{ url_for('index', page=pagination.next_num) }}">></a>
+        {% endif %}
+    </div>
+    <script>
+        function filterTable() {
+            const dossierQuery = document.getElementById('dossierSearch').value.toLowerCase();
+            const aparQuery = document.getElementById('aparSearch').value.toLowerCase();
+            const filenameQuery = document.getElementById('filenameSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#pdfTable tbody tr');
+
+            rows.forEach(row => {
+                const dossier = row.cells[0].textContent.toLowerCase();
+                const apar = row.cells[1].textContent.toLowerCase();
+                const filename = row.cells[2].textContent.toLowerCase();
+                row.style.display = (
+                    dossier.includes(dossierQuery) &&
+                    apar.includes(aparQuery) &&
+                    filename.includes(filenameQuery)
+                ) ? '' : 'none';
+            });
+        }
+
+        function sortTable(column) {
+            const table = document.getElementById('pdfTable');
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const sortOrder = document.getElementById(`${column}Sort`).value === 'desc' ? 'asc' : 'desc';
+            rows.sort((a, b) => {
+                const aValue = a.cells[{'dossier_number': 0, 'apar_employee_name': 1, 'filename': 2}[column]].textContent;
+                const bValue = b.cells[{'dossier_number': 0, 'apar_employee_name': 1, 'filename': 2}[column]].textContent;
+                return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+            });
+            rows.forEach(row => table.tbody.appendChild(row));
+            document.querySelectorAll('th input[type="hidden"]').forEach(input => input.value = '');
+            document.getElementById(`${column}Sort`).value = sortOrder;
+        }
+
+        window.onload = function() {
+            filterTable();
+            const initialSort = '{{ sort_by }}';
+            if (initialSort) sortTable(initialSort);
+        };
+    </script>
+{% endblock %}
+</html>

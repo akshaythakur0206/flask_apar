@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style_emp.css')}}">
+<div class="container">
+    <h2>Add Employee</h2>   
+    <form method="GET" action="{{ url_for('employee') }}">
+        <label for="cdac_emp_id">Enter CDAC Employee ID:</label>
+        <input type="text" name="cdac_emp_id" id="cdac_emp_id" value="{{ request.args.get('cdac_emp_id', '') }}" required>
+        <div class="button-container">
+          <button class="btn" type="submit" name="action" value="sahas">Fetch from Sahas</button>
+          <button class="btn" type="submit" name="action" value="apar">Fetch from APAR</button>
+        </div>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <p class="flash {{ category }}">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% if show_employee %}
+    <form method="POST" action="{{ url_for('employee') }}">
+        {{form.hidden_tag() }}
+        <label for="cdac_emp_id">{{ form.cdac_emp_id.label }} </label>
+        {{form.cdac_emp_id}} 
+        <label for="name">{{form.name.label}}</label>
+        {{form.name}} 
+        <label for="dept">{{form.dept.label}} </label>
+        {{form.dept}} 
+        <label for="designation">{{form.designation.label}} </label>
+        {{form.designation}}
+        <label for="dob">{{ form.dob.label }}</label>
+        {{form.dob}}
+        <label for="doj">{{ form.doj.label }}</label>
+        {{form.doj}}
+        <label for="dossier_no">{{form.dossier_no.label}} </label>
+        {{form.dossier_no}}
+        <label for="mobile_no">{{form.mobile_no.label}} </label>
+        {{form.mobile_no}} 
+        <label for="father_name">{{form.father_name.label}} </label>
+        {{form.father_name}}
+        {{form.submit(class="btn")}}
+    </form>
+    {% endif %}
+    {% if apar_list %}
+    <h3>APAR Records</h3>
+    <form method="POST" action="{{ url_for('employee', cdac_emp_id=request.args.get('cdac_emp_id'), action='apar') }}">
+        {{ form.hidden_tag() }}
+      <table border="1" cellpadding="5" cellspacing="0">
+          <thead>
+              <tr>
+                  <th>Date From</th>
+                  <th>Date To</th>
+                  <th>Employee</th>
+                  <th>Reporting Officer</th>
+                  <th>Reviewing Officer</th>
+                  <th>Status</th>
+                  <th>Grade</th>
+                  <th>Grade Label</th>
+                  <th>Download/view</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for record in apar_list %}
+              <tr>
+                  <td>{{ record.date_from.strftime("%d-%m-%Y") }}</td>
+                  <td>{{ record.date_to.strftime("%d-%m-%Y") }}</td>
+                  <td>{{ record.name }}</td>
+                  <td>{{ record.reporting_officer }}</td>
+                  <td>{{ record.reviewing_officer }}</td>
+                  <td>{{ record.apar_status }}</td>
+                  <td>{{ record.grade }}</td>
+                  <td>{{ record.grade_label }}</td>
+                  <td>Download/View</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+      <button type="submit" name="save_apar" value="1" class="btn">Save APAR Data</button>
+    </form>
+    {% endif %}
+
+</div>
+
+
+{% endblock %}
